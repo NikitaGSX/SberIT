@@ -1,0 +1,30 @@
+#!groovy
+// Run docker build
+properties([disableConcurrentBuilds()])
+
+pipeline {
+    agent { 
+        label 'master'
+        }
+    triggers { pollSCM('* * * * *') }
+    options {
+        timestamps()
+    }
+    stages {
+        stage("create docker image") {
+            steps {
+                echo "start building image"
+                dir ('docker') {
+                	sh 'docker build -t pythonimage . '
+                }
+            }
+        }
+        stage("run docker image") {
+            steps {
+                echo "run image"
+                dir ('docker') {
+                	sh 'docker --name test1 pythonimage '
+                }
+            }
+        }
+}
